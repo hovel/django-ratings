@@ -4,10 +4,8 @@ Template tags for Django
 # TODO: add in Jinja tags if Coffin is available
 
 from django import template
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import ObjectDoesNotExist
-
-from djangoratings.models import Vote
+from django.template.base import Variable
 
 register = template.Library()
 
@@ -19,8 +17,8 @@ class RatingByRequestNode(template.Node):
     
     def render(self, context):
         try:
-            request = template.resolve_variable(self.request, context)
-            obj = template.resolve_variable(self.obj, context)
+            request = Variable.resolve(self.request, context)
+            obj = Variable.resolve(self.obj, context)
             field = getattr(obj, self.field_name)
         except (template.VariableDoesNotExist, AttributeError):
             return ''
@@ -55,8 +53,8 @@ register.tag('rating_by_request', do_rating_by_request)
 class RatingByUserNode(RatingByRequestNode):
     def render(self, context):
         try:
-            user = template.resolve_variable(self.request, context)
-            obj = template.resolve_variable(self.obj, context)
+            user = Variable.resolve(self.request, context)
+            obj = Variable.resolve(self.obj, context)
             field = getattr(obj, self.field_name)
         except template.VariableDoesNotExist:
             return ''
