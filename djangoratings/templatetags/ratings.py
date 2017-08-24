@@ -17,8 +17,8 @@ class RatingByRequestNode(template.Node):
     
     def render(self, context):
         try:
-            request = Variable.resolve(self.request, context)
-            obj = Variable.resolve(self.obj, context)
+            request = Variable(self.request).resolve(context)
+            obj = Variable(self.obj).resolve(context)
             field = getattr(obj, self.field_name)
         except (template.VariableDoesNotExist, AttributeError):
             return ''
@@ -53,8 +53,8 @@ register.tag('rating_by_request', do_rating_by_request)
 class RatingByUserNode(RatingByRequestNode):
     def render(self, context):
         try:
-            user = Variable.resolve(self.request, context)
-            obj = Variable.resolve(self.obj, context)
+            user = Variable(self.request).resolve(context)
+            obj = Variable(self.obj).resolve(context)
             field = getattr(obj, self.field_name)
         except template.VariableDoesNotExist:
             return ''
