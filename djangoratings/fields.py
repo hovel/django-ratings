@@ -7,7 +7,7 @@ from datetime import datetime
 
 from models import Vote, Score
 from default_settings import RATINGS_VOTES_PER_IP
-from exceptions import *
+from djangoratings.exceptions import *
 
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:
     raise ImportError("djangoratings requires django.contrib.contenttypes in your INSTALLED_APPS")
