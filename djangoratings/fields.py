@@ -1,12 +1,12 @@
 from django.db.models import IntegerField, PositiveIntegerField
 from django.conf import settings
+from django.utils.encoding import force_bytes
 
-import forms
-import itertools
 from datetime import datetime
 
-from models import Vote, Score
-from default_settings import RATINGS_VOTES_PER_IP
+from djangoratings import forms
+from djangoratings.models import Vote, Score
+from djangoratings.default_settings import RATINGS_VOTES_PER_IP
 from djangoratings.exceptions import *
 
 if 'django.contrib.contenttypes' not in settings.INSTALLED_APPS:
@@ -27,7 +27,7 @@ except ImportError:
     now = datetime.now
 
 def md5_hexdigest(value):
-    return md5(value).hexdigest()
+    return md5(force_bytes(value)).hexdigest()
 
 class Rating(object):
     def __init__(self, score, votes):
@@ -97,7 +97,7 @@ class RatingManager(object):
             key             = self.field.key,
         )
 
-        if not (user and user.is_authenticated()):
+        if not (user and user.is_authenticated):
             if not ip_address:
                 raise ValueError('``user`` or ``ip_address`` must be present.')
             kwargs['user__isnull'] = True
@@ -144,7 +144,7 @@ class RatingManager(object):
         if score < 0 or score > self.field.range:
             raise InvalidRating("%s is not a valid choice for %s" % (score, self.field.name))
 
-        is_anonymous = (user is None or not user.is_authenticated())
+        is_anonymous = (user is None or not user.is_authenticated)
         if is_anonymous and not self.field.allow_anonymous:
             raise AuthRequired("user must be a user, not '%r'" % (user,))
         

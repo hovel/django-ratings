@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils.six import python_2_unicode_compatible
 
 # support for custom User models in Django 1.5+
 from djangoratings.compat import get_username_field
@@ -13,15 +14,19 @@ try:
 except ImportError:
     now = datetime.now
 
-from managers import VoteManager, SimilarUserManager
+from djangoratings.managers import VoteManager, SimilarUserManager
 
 
+@python_2_unicode_compatible
 class Vote(models.Model):
-    content_type = models.ForeignKey(ContentType, related_name="votes")
+    content_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, related_name="votes")
     object_id = models.PositiveIntegerField()
     key = models.CharField(max_length=32)
     score = models.IntegerField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name="votes")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True,
+        null=True, related_name="votes")
     ip_address = models.GenericIPAddressField()
     cookie = models.CharField(max_length=32, blank=True, null=True)
     date_added = models.DateTimeField(default=now, editable=False)
@@ -34,7 +39,7 @@ class Vote(models.Model):
     class Meta:
         unique_together = (('content_type', 'object_id', 'key', 'user', 'ip_address', 'cookie'), )
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s voted %s on %s" % (self.user_display, self.score, self.content_object)
 
     def save(self, *args, **kwargs):
@@ -56,8 +61,9 @@ class Vote(models.Model):
     partial_ip_address = property(partial_ip_address)
 
 
+@python_2_unicode_compatible
 class Score(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     key = models.CharField(max_length=32)
     score = models.IntegerField()
@@ -68,13 +74,18 @@ class Score(models.Model):
     class Meta:
         unique_together = (('content_type', 'object_id', 'key'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s scored %s with %s votes" % (self.content_object, self.score, self.votes)
 
 
+@python_2_unicode_compatible
 class SimilarUser(models.Model):
-    from_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="similar_users")
-    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="similar_users_from")
+    from_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="similar_users")
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name="similar_users_from")
     agrees = models.PositiveIntegerField(default=0)
     disagrees = models.PositiveIntegerField(default=0)
     exclude = models.BooleanField(default=False)
@@ -84,13 +95,14 @@ class SimilarUser(models.Model):
     class Meta:
         unique_together = (('from_user', 'to_user'),)
 
-    def __unicode__(self):
-        print(u"%s %s similar to %s" % (self.from_user, self.exclude and 'is not' or 'is', self.to_user))
+    def __str__(self):
+        return u"%s %s similar to %s" % (self.from_user, self.exclude and 'is not' or 'is', self.to_user)
 
 
+@python_2_unicode_compatible
 class IgnoredObject(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    content_type = models.ForeignKey(ContentType)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
 
     content_object = GenericForeignKey()
@@ -98,5 +110,5 @@ class IgnoredObject(models.Model):
     class Meta:
         unique_together = (('content_type', 'object_id'),)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.content_object

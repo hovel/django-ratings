@@ -79,8 +79,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'djangoratings',
-        'USER': os.environ['DB_USER'],
-        'PASSWORD': os.environ['DB_PASSWORD']
+        'USER': 'root',
+        'PASSWORD': '',
+        'ATOMIC_REQUESTS': True,
+        'OPTIONS': {
+            'isolation_level': 'read committed',
+        },
+        'TEST': {
+            'NAME': 'test_djangoratings',
+        },
     }
 }
 
@@ -122,3 +129,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+try:
+    from .settings_local import *
+except ImportError:
+    pass

@@ -2,14 +2,15 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.six import python_2_unicode_compatible
 
-# Create your models here.
 from djangoratings.fields import AnonymousRatingField, RatingField
 
 
+@python_2_unicode_compatible
 class RatingTestModel(models.Model):
     rating = AnonymousRatingField(range=2, can_change_vote=True)
     rating2 = RatingField(range=2, can_change_vote=False)
 
-    def __unicode__(self):
-        return unicode(self.pk)
+    def __str__(self):
+        return '{}'.format(self.pk)

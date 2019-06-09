@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 tests_require = [
     'django',
-    'mysql-python',
+    'mysqlclient',
     # also requires the disqus fork of haystack
 ]
 

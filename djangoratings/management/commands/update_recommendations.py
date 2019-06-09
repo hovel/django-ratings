@@ -1,7 +1,7 @@
-from django.core.management.base import NoArgsCommand, CommandError
+from django.core.management import BaseCommand
 
 from djangoratings.models import SimilarUser
 
-class Command(NoArgsCommand):
-    def handle_noargs(self, **options):
+class Command(BaseCommand):
+    def handle(self, *args, **options):
         SimilarUser.objects.update_recommendations()
