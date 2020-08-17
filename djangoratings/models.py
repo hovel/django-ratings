@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.six import python_2_unicode_compatible
 
 # support for custom User models in Django 1.5+
 from djangoratings.compat import get_username_field
@@ -17,7 +16,6 @@ except ImportError:
 from djangoratings.managers import VoteManager, SimilarUserManager
 
 
-@python_2_unicode_compatible
 class Vote(models.Model):
     content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, related_name="votes")
@@ -61,7 +59,6 @@ class Vote(models.Model):
     partial_ip_address = property(partial_ip_address)
 
 
-@python_2_unicode_compatible
 class Score(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -78,7 +75,7 @@ class Score(models.Model):
         return u"%s scored %s with %s votes" % (self.content_object, self.score, self.votes)
 
 
-@python_2_unicode_compatible
+
 class SimilarUser(models.Model):
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
@@ -99,7 +96,7 @@ class SimilarUser(models.Model):
         return u"%s %s similar to %s" % (self.from_user, self.exclude and 'is not' or 'is', self.to_user)
 
 
-@python_2_unicode_compatible
+
 class IgnoredObject(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
